@@ -12,7 +12,7 @@ def add_time(start_time, duration, day=None):
     end_time = minutes_to_time(start_in_minutes, duration_in_minutes)
 
 
-    return
+    return end_time
 
 
 
@@ -48,7 +48,7 @@ def parse_input(start_time, duration, day=None):
 
 
 
-def set_day(parsed_day):
+def set_day(day_parsed):
 
     if day_parsed == "monday":
         today = 1
@@ -89,16 +89,15 @@ def duration_to_minutes(parsed_duration):
     return minutes
 
 
-
+# day is not a parameter because it's kept track of via global variable
 def minutes_to_time(start_in_minutes, duration_in_minutes):
 
     minutes = start_in_minutes + duration_in_minutes
     hours = 0
     days = 0
     time_AM = None
-    time_days = 0
-    time_hours = 0
-    time_minutes = 0
+    final_days = 0
+    day_display_flag = -1
     clock_time = []
 
     while minutes >= MINUTES_IN_DAY:
@@ -114,33 +113,48 @@ def minutes_to_time(start_in_minutes, duration_in_minutes):
     else:
         time_AM = False
         hours = hours - 12
-    #######
+    
+    final_days = today + days
 
     # result is multiple days later
-    if start_in_minutes + duration_in_minutes >= (MINUTES_IN_DAY * 2):
-        return
+    if final_days - today >= 2:
+        day_display_flag = 2
 
-    #result is the next day
-    if start_in_minutes + duration_in_minutes >= MINUTES_IN_DAY:
-        return
-
-    # result is same day
-    if start_in_minutes + duration_in_minutes < MINUTES_IN_DAY:
-        return
+    # result is the next day
+    if final_days - today == 1:
+        day_display_flag = 1
+    
+    # user wants days displayed
+    if today > 0:
+        day_display_flag = 0
+    
+    clock_time.append(str(hours))
+    clock_time.append(":")
+    clock_time.append(str(minutes).zfill(2))
+    clock_time.append(" ")
+    if time_AM == True:
+        clock_time.append("AM")
+    else:
+        clock_time.append("PM")
+    
+    output = "".join(clock_time)
+    
+    
+    return output
 
 
     
 
     
-    # better to refactor to add days now
     
 
 
 
-test_input = ("9:50 PM", "0:10", "tuesday")
+test_input = ("3:30 PM", "10:30", "tuesday")
 
 parsed_test = parse_input(test_input[0], test_input[1])
 
 print("Parsed input:", parsed_test)
 print("Minutes:", time_to_minutes(parsed_test[0]))
 print("Duration:", duration_to_minutes(parsed_test[1]))
+print("Output:", add_time(test_input[0], test_input[1], test_input[2]))
