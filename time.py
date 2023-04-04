@@ -50,6 +50,8 @@ def parse_input(start_time, duration, day=None):
 
 def set_day(day_parsed):
 
+    global today
+
     if day_parsed == "monday":
         today = 1
     elif day_parsed == "tuesday":
@@ -64,6 +66,23 @@ def set_day(day_parsed):
         today = 6
     elif day_parsed == "sunday":
         today = 7
+
+def get_day():
+
+    if today == 1:
+        return "Monday"
+    if today == 2:
+        return "Tuesday"
+    if today == 3:
+        return "Wednesday"
+    if today == 4:
+        return "Thursday"
+    if today == 5:
+        return "Friday"
+    if today == 6:
+        return "Saturday"
+    if today == 7:
+        return "Sunday"
 
 
 def time_to_minutes(parsed_start_time):
@@ -98,6 +117,7 @@ def minutes_to_time(start_in_minutes, duration_in_minutes):
     time_AM = None
     final_days = 0
     day_display_flag = -1
+    display_days = False
     clock_time = []
 
     while minutes >= MINUTES_IN_DAY:
@@ -124,19 +144,40 @@ def minutes_to_time(start_in_minutes, duration_in_minutes):
     if final_days - today == 1:
         day_display_flag = 1
     
-    # user wants days displayed
-    if today > 0:
+    # result is today
+    if final_days - today == 0:
         day_display_flag = 0
     
-    clock_time.append(str(hours))
+    # user wants day displayed
+    if today > 0:
+        display_days = True
+    
+    if hours == 00:
+        clock_time.append("12")
+    else:
+        clock_time.append(str(hours))
     clock_time.append(":")
     clock_time.append(str(minutes).zfill(2))
     clock_time.append(" ")
+
     if time_AM == True:
         clock_time.append("AM")
     else:
         clock_time.append("PM")
+
+    # case: user input day of the week
+    if display_days == True:
+        clock_time.append(", ")
+        clock_time.append(str(get_day()))
+
+    # case: user did NOT input day of week + result is next day
+    if day_display_flag == 1 and display_days == False:
+        clock_time.append(" (next day)")
     
+    # case: user did NOT input day of week + result is multiple days later
+    if day_display_flag == 2 and display_days == False:
+        clock_time.append(f" ({days} days later)")
+
     output = "".join(clock_time)
     
     
@@ -150,11 +191,6 @@ def minutes_to_time(start_in_minutes, duration_in_minutes):
 
 
 
-test_input = ("3:30 PM", "10:30", "tuesday")
+test_input = ("11:43 PM", "24:20", "tueSday")
 
-parsed_test = parse_input(test_input[0], test_input[1])
-
-print("Parsed input:", parsed_test)
-print("Minutes:", time_to_minutes(parsed_test[0]))
-print("Duration:", duration_to_minutes(parsed_test[1]))
 print("Output:", add_time(test_input[0], test_input[1], test_input[2]))
